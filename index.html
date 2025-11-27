@@ -49,7 +49,6 @@
             margin-bottom: 20px;
         }
         
-        /* Login Form */
         .login-container {
             max-width: 500px;
             margin: 0 auto;
@@ -90,7 +89,6 @@
             font-size: 14px;
         }
         
-        /* Game Info */
         .game-info {
             display: flex;
             justify-content: space-between;
@@ -115,7 +113,6 @@
             color: #1a2a6c;
         }
         
-        /* Question */
         .question-container {
             margin-bottom: 25px;
             padding: 20px;
@@ -172,7 +169,6 @@
             border-color: #dc3545;
         }
         
-        /* Navigation */
         .navigation {
             display: flex;
             justify-content: space-between;
@@ -204,7 +200,6 @@
             background-color: #218838;
         }
         
-        /* Results */
         .result-container {
             text-align: center;
             padding: 30px;
@@ -223,7 +218,6 @@
             line-height: 1.6;
         }
         
-        /* Leaderboard */
         .leaderboard-container {
             margin-top: 30px;
             padding: 20px;
@@ -270,7 +264,6 @@
             width: 60px;
         }
         
-        /* Progress */
         .progress-bar {
             width: 100%;
             height: 10px;
@@ -287,7 +280,6 @@
             transition: width 0.5s;
         }
         
-        /* Image placeholder */
         .image-placeholder {
             width: 100%;
             padding: 20px;
@@ -300,15 +292,18 @@
             font-style: italic;
         }
         
-        /* Hidden class */
         .hidden {
             display: none;
+        }
+        
+        .user-highlight {
+            background-color: #fff3cd !important;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Login Section -->
         <div id="login-container">
             <header>
                 <h1>🔬 Game Trắc Nghiệm Hóa Học</h1>
@@ -345,7 +340,6 @@
             </div>
         </div>
 
-        <!-- Quiz Section -->
         <div id="quiz-container" class="hidden">
             <header>
                 <h1>🔬 Game Trắc Nghiệm Hóa Học</h1>
@@ -388,7 +382,6 @@
             </div>
         </div>
 
-        <!-- Results Section -->
         <div id="result-container" class="result-container hidden">
             <h2>🎉 Kết Quả Bài Làm</h2>
             <div class="score" id="final-score">0/10</div>
@@ -400,7 +393,6 @@
             </div>
         </div>
 
-        <!-- Leaderboard Section -->
         <div id="leaderboard-container" class="leaderboard-container hidden">
             <h2 class="leaderboard-title">🏆 Bảng Điểm Cao</h2>
             <table id="leaderboard-table">
@@ -411,10 +403,10 @@
                         <th>Lớp</th>
                         <th>Điểm</th>
                         <th>Thời gian</th>
+                        <th>Thời gian hoàn thành</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
-                    <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
                 </tbody>
             </table>
             
@@ -426,7 +418,6 @@
     </div>
 
     <script>
-        // ========== DỮ LIỆU VÀ BIẾN TOÀN CỤC ==========
         const questions = [
             {
                 number: 1,
@@ -498,12 +489,12 @@
         let currentQuestionIndex = 0;
         let userAnswers = new Array(questions.length).fill(null);
         let score = 0;
-        let timeLeft = 600; // 10 phút
+        let timeLeft = 600;
         let timerInterval;
         let currentUser = null;
         let leaderboard = JSON.parse(localStorage.getItem('chemistry_leaderboard')) || [];
+        let startTime = null;
 
-        // ========== DOM ELEMENTS ==========
         const loginContainer = document.getElementById('login-container');
         const quizContainer = document.getElementById('quiz-container');
         const resultContainer = document.getElementById('result-container');
@@ -535,7 +526,6 @@
         const newGameBtn = document.getElementById('new-game-btn');
         const leaderboardBody = document.getElementById('leaderboard-body');
 
-        // ========== HỆ THỐNG ĐĂNG NHẬP ==========
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -555,24 +545,21 @@
                 loginTime: new Date().toLocaleString('vi-VN')
             };
             
-            // Cập nhật thông tin người dùng
             userInfoElement.textContent = `Chào ${username} - Lớp ${userClass}`;
             playerNameElement.textContent = username;
             
-            // Chuyển sang màn hình game
             loginContainer.classList.add('hidden');
             quizContainer.classList.remove('hidden');
             
-            // Bắt đầu game
             initGame();
         });
 
-        // ========== KHỞI TẠO GAME ==========
         function initGame() {
             currentQuestionIndex = 0;
             userAnswers.fill(null);
             score = 0;
             timeLeft = 600;
+            startTime = Date.now();
             scoreElement.textContent = score;
             updateProgressBar();
             startTimer();
@@ -585,7 +572,6 @@
             questionNumberElement.textContent = `Câu ${question.number}:`;
             questionTextElement.innerHTML = question.text;
             
-            // Thêm placeholder hình ảnh cho câu hỏi 8 và 10
             if (question.number === 8 || question.number === 10) {
                 const existingImage = questionTextElement.querySelector('.image-placeholder');
                 if (!existingImage) {
@@ -619,12 +605,10 @@
             const question = questions[currentQuestionIndex];
             const options = document.querySelectorAll('.option');
             
-            // Vô hiệu hóa tất cả options sau khi chọn
             options.forEach(option => {
                 option.style.pointerEvents = 'none';
             });
             
-            // Hiển thị kết quả
             options.forEach((option, idx) => {
                 option.classList.remove('correct', 'incorrect', 'selected');
                 if (idx === optionIndex) {
@@ -640,7 +624,6 @@
                 }
             });
             
-            // Tự động chuyển câu sau 1.5 giây
             setTimeout(() => {
                 if (currentQuestionIndex < questions.length - 1) {
                     currentQuestionIndex++;
@@ -679,7 +662,6 @@
             progressElement.style.width = `${progress}%`;
         }
 
-        // ========== BỘ ĐẾM THỜI GIAN ==========
         function startTimer() {
             clearInterval(timerInterval);
             updateTimerDisplay();
@@ -707,13 +689,11 @@
             }
         }
 
-        // ========== NỘP BÀI VÀ KẾT QUẢ ==========
         submitBtn.addEventListener('click', submitQuiz);
 
         function submitQuiz() {
             clearInterval(timerInterval);
             
-            // Tính điểm cuối cùng
             score = 0;
             questions.forEach((question, index) => {
                 if (userAnswers[index] === question.correctAnswer) {
@@ -721,36 +701,30 @@
                 }
             });
             
-            // Lưu kết quả
             saveResult();
-            
-            // Hiển thị kết quả
             showResults();
         }
 
         function saveResult() {
+            const timeSpent = 600 - timeLeft;
             const result = {
                 username: currentUser.username,
                 email: currentUser.email,
                 class: currentUser.class,
                 score: score,
                 totalQuestions: questions.length,
-                timeSpent: 600 - timeLeft,
-                completedAt: new Date().toLocaleString('vi-VN')
+                timeSpent: timeSpent,
+                completedAt: new Date().toLocaleString('vi-VN'),
+                timestamp: Date.now()
             };
             
-            // Thêm vào leaderboard
             leaderboard.push(result);
-            
-            // Sắp xếp leaderboard theo điểm (cao đến thấp)
             leaderboard.sort((a, b) => b.score - a.score);
             
-            // Giữ chỉ 50 kết quả cao nhất
             if (leaderboard.length > 50) {
                 leaderboard = leaderboard.slice(0, 50);
             }
             
-            // Lưu vào localStorage
             localStorage.setItem('chemistry_leaderboard', JSON.stringify(leaderboard));
         }
 
@@ -774,7 +748,6 @@
             resultMessageElement.textContent = message;
         }
 
-        // ========== BẢNG ĐIỂM ==========
         function showLeaderboard() {
             resultContainer.classList.add('hidden');
             leaderboardContainer.classList.remove('hidden');
@@ -782,18 +755,16 @@
             leaderboardBody.innerHTML = '';
             
             if (leaderboard.length === 0) {
-                leaderboardBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Chưa có dữ liệu</td></tr>';
+                leaderboardBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Chưa có dữ liệu</td></tr>';
                 return;
             }
             
             leaderboard.forEach((result, index) => {
                 const row = document.createElement('tr');
                 
-                // Highlight kết quả hiện tại
                 if (result.username === currentUser.username && 
-                    result.score === score && 
-                    result.class === currentUser.class) {
-                    row.style.backgroundColor = '#fff3cd';
+                    Math.abs(result.timestamp - Date.now()) < 5000) {
+                    row.classList.add('user-highlight');
                 }
                 
                 row.innerHTML = `
@@ -802,13 +773,13 @@
                     <td>${result.class}</td>
                     <td><strong>${result.score}/${result.totalQuestions}</strong></td>
                     <td>${Math.floor(result.timeSpent / 60)}:${(result.timeSpent % 60).toString().padStart(2, '0')}</td>
+                    <td>${result.completedAt}</td>
                 `;
                 
                 leaderboardBody.appendChild(row);
             });
         }
 
-        // ========== ĐIỀU HƯỚNG ==========
         restartBtn.addEventListener('click', () => {
             resultContainer.classList.add('hidden');
             quizContainer.classList.remove('hidden');
@@ -825,13 +796,9 @@
         newGameBtn.addEventListener('click', () => {
             leaderboardContainer.classList.add('hidden');
             loginContainer.classList.remove('hidden');
-            
-            // Reset form
             loginForm.reset();
         });
 
-        // ========== KHỞI CHẠY ==========
-        // Kiểm tra nếu đã có dữ liệu leaderboard
         if (leaderboard.length > 0) {
             console.log('Đã tải leaderboard:', leaderboard.length, 'kết quả');
         }
