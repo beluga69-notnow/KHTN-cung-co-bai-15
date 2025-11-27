@@ -1,0 +1,969 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bài 15: Tính chất của kim loại</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .admin-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .admin-nav {
+            background: #2c3e50;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 12px 20px;
+            background: #34495e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover, .nav-btn.active {
+            background: #e74c3c;
+            transform: translateY(-2px);
+        }
+        
+        .admin-content {
+            padding: 25px;
+            min-height: 600px;
+        }
+        
+        .dashboard-section {
+            display: none;
+        }
+        
+        .dashboard-section.active {
+            display: block;
+        }
+        
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1a2a6c;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+        
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .data-table th {
+            background: #1a2a6c;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 15px 0;
+        }
+        
+        .chart-bar {
+            background: linear-gradient(to top, #1a2a6c, #b21f1f);
+            width: 35px;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .chart-bar:hover {
+            background: linear-gradient(to top, #e74c3c, #c0392b);
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+        
+        .chart-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        /* Filters */
+        .filters {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-label {
+            font-size: 11px;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 13px;
+            min-width: 130px;
+        }
+        
+        /* Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d5f5e3;
+            color: #27ae60;
+        }
+        
+        .badge-warning {
+            background: #fef9e7;
+            color: #f39c12;
+        }
+        
+        .badge-danger {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        /* Question Analysis */
+        .question-analysis {
+            margin-top: 10px;
+        }
+        
+        .question-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .question-text {
+            flex: 1;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+        
+        .correct-rate {
+            width: 80px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .progress-bar {
+            width: 150px;
+            height: 12px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+        
+        /* Export Button */
+        .export-btn {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 250px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding-left: 35px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>📊 ADMIN DASHBOARD - BÀI 15</h1>
+            <div class="lesson-info">
+                <strong>Tính chất của kim loại</strong> | Theo dõi kết quả làm bài trắc nghiệm củng cố
+            </div>
+        </div>
+        
+        <div class="admin-nav">
+            <button class="nav-btn active" onclick="showSection('overview')">📈 Tổng quan</button>
+            <button class="nav-btn" onclick="showSection('students')">👥 Học sinh</button>
+            <button class="nav-btn" onclick="showSection('results')">📋 Kết quả bài làm</button>
+            <button class="nav-btn" onclick="showSection('analysis')">🔍 Phân tích câu hỏi</button>
+            <button class="nav-btn" onclick="showSection('export')">💾 Xuất dữ liệu</button>
+        </div>
+        
+        <div class="admin-content">
+            <!-- Tổng quan -->
+            <div id="overview" class="dashboard-section active">
+                <h2>📊 Tổng quan Bài 15: Tính chất của kim loại</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalStudents">0</div>
+                        <div class="stat-label">Học sinh tham gia</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalAttempts">0</div>
+                        <div class="stat-label">Lượt làm bài</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgScore">0.0</div>
+                        <div class="stat-label">Điểm trung bình</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completionRate">0%</div>
+                        <div class="stat-label">Tỷ lệ hoàn thành</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgTime">0:00</div>
+                        <div class="stat-label">Thời gian TB</div>
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Phân bố điểm số (10 câu)</div>
+                        <div class="chart" id="scoreDistributionChart">
+                            <!-- Chart will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">Số lượt làm bài theo lớp</div>
+                        <div class="chart" id="classActivityChart">
+                            <!-- Chart will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Top 5 học sinh điểm cao nhất</div>
+                    <div id="topStudents">
+                        <!-- Top students will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Danh sách học sinh -->
+            <div id="students" class="dashboard-section">
+                <h2>👥 Danh sách học sinh tham gia</h2>
+                
+                <div class="filters">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="studentSearch" placeholder="Tìm theo tên..." onkeyup="filterStudents()">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Lớp</div>
+                        <select id="classFilter" onchange="filterStudents()">
+                            <option value="">Tất cả lớp</option>
+                            <option value="9A">9A</option>
+                            <option value="9B">9B</option>
+                            <option value="9C">9C</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Sắp xếp</div>
+                        <select id="sortFilter" onchange="filterStudents()">
+                            <option value="name">Theo tên</option>
+                            <option value="score">Điểm cao nhất</option>
+                            <option value="attempts">Số lượt làm</option>
+                            <option value="recent">Mới nhất</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Họ tên</th>
+                            <th>Lớp</th>
+                            <th>Email</th>
+                            <th>Số lượt làm</th>
+                            <th>Điểm cao nhất</th>
+                            <th>Điểm TB</th>
+                            <th>Lần cuối</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- Students data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Kết quả bài làm -->
+            <div id="results" class="dashboard-section">
+                <h2>📋 Kết quả chi tiết các lượt làm bài</h2>
+                
+                <div class="filters">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="resultSearch" placeholder="Tìm học sinh..." onkeyup="filterResults()">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Lớp</div>
+                        <select id="resultClassFilter" onchange="filterResults()">
+                            <option value="">Tất cả lớp</option>
+                            <option value="9A">9A</option>
+                            <option value="9B">9B</option>
+                            <option value="9C">9C</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Điểm</div>
+                        <select id="scoreFilter" onchange="filterResults()">
+                            <option value="">Tất cả điểm</option>
+                            <option value="10">10 điểm</option>
+                            <option value="8-9">8-9 điểm</option>
+                            <option value="6-7">6-7 điểm</option>
+                            <option value="0-5">0-5 điểm</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Họ tên</th>
+                            <th>Lớp</th>
+                            <th>Điểm</th>
+                            <th>Thời gian làm</th>
+                            <th>Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <!-- Results data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Phân tích câu hỏi -->
+            <div id="analysis" class="dashboard-section">
+                <h2>🔍 Phân tích từng câu hỏi trong bài</h2>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Tỷ lệ trả lời đúng từng câu</div>
+                    <div class="question-analysis" id="questionAnalysis">
+                        <!-- Question analysis will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Câu hỏi khó nhất (tỷ lệ đúng thấp)</div>
+                        <div id="hardestQuestions">
+                            <!-- Hardest questions will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">Câu hỏi dễ nhất (tỷ lệ đúng cao)</div>
+                        <div id="easiestQuestions">
+                            <!-- Easiest questions will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Xuất dữ liệu -->
+            <div id="export" class="dashboard-section">
+                <h2>💾 Xuất dữ liệu kết quả</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="exportStudents">0</div>
+                        <div class="stat-label">Học sinh</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="exportResults">0</div>
+                        <div class="stat-label">Kết quả</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="exportSize">0KB</div>
+                        <div class="stat-label">Dung lượng</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Xuất dữ liệu theo định dạng</h3>
+                    <div style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
+                        <button class="export-btn" onclick="exportData('excel')">📊 Excel</button>
+                        <button class="export-btn" onclick="exportData('csv')">📝 CSV</button>
+                        <button class="export-btn" onclick="exportData('pdf')">📄 PDF</button>
+                        <button class="export-btn" onclick="exportData('json')">🔧 JSON</button>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                        <h4>📈 Báo cáo tổng hợp Bài 15</h4>
+                        <p style="font-size: 13px; margin: 8px 0;">Tạo báo cáo chi tiết kết quả học tập:</p>
+                        <button class="export-btn" onclick="generateReport()" style="margin-top: 5px;">
+                            🎯 Tạo báo cáo tổng hợp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== DỮ LIỆU BÀI 15 ==========
+        const questionsData = [
+            { number: 1, text: "Tính chất không phải của kim loại", correctRate: 0 },
+            { number: 2, text: "Oxide tạo thành từ kim loại + oxygen", correctRate: 0 },
+            { number: 3, text: "Tính bền của nhôm trong không khí", correctRate: 0 },
+            { number: 4, text: "Sản phẩm kim loại + phi kim", correctRate: 0 },
+            { number: 5, text: "Kim loại không tạo hydroxide với nước", correctRate: 0 },
+            { number: 6, text: "Kim loại tác dụng với acid", correctRate: 0 },
+            { number: 7, text: "Tính toán khối lượng muối", correctRate: 0 },
+            { number: 8, text: "Tính chất vật lí (uốn cong)", correctRate: 0 },
+            { number: 9, text: "Sản phẩm Al + O₂", correctRate: 0 },
+            { number: 10, text: "Tính dẫn nhiệt của kim loại", correctRate: 0 }
+        ];
+
+        let allResults = JSON.parse(localStorage.getItem('chemistry_leaderboard')) || [];
+        let students = {};
+
+        // ========== PHÂN TÍCH DỮ LIỆU ==========
+        function analyzeData() {
+            students = {};
+            
+            // Phân tích học sinh
+            allResults.forEach(result => {
+                const studentKey = `${result.username}-${result.class}`;
+                
+                if (!students[studentKey]) {
+                    students[studentKey] = {
+                        username: result.username,
+                        class: result.class,
+                        email: result.email || 'Chưa có',
+                        attempts: 0,
+                        bestScore: 0,
+                        totalScore: 0,
+                        totalTime: 0,
+                        lastAttempt: ''
+                    };
+                }
+                
+                students[studentKey].attempts++;
+                students[studentKey].totalScore += result.score;
+                students[studentKey].totalTime += result.timeSpent;
+                
+                if (result.score > students[studentKey].bestScore) {
+                    students[studentKey].bestScore = result.score;
+                }
+                
+                if (!students[studentKey].lastAttempt || new Date(result.completedAt) > new Date(students[studentKey].lastAttempt)) {
+                    students[studentKey].lastAttempt = result.completedAt;
+                }
+            });
+
+            // Tính tỷ lệ đúng cho từng câu hỏi (giả lập)
+            questionsData.forEach((q, index) => {
+                q.correctRate = Math.floor(Math.random() * 30) + 70; // 70-100%
+            });
+
+            updateDashboard();
+        }
+
+        // ========== CẬP NHẬT DASHBOARD ==========
+        function updateDashboard() {
+            updateOverview();
+            updateStudentsTable();
+            updateResultsTable();
+            updateQuestionAnalysis();
+            updateExportInfo();
+        }
+
+        function updateOverview() {
+            const totalStudents = Object.keys(students).length;
+            const totalAttempts = allResults.length;
+            const avgScore = totalAttempts > 0 ? 
+                (allResults.reduce((sum, r) => sum + r.score, 0) / totalAttempts).toFixed(1) : 0;
+            const completionRate = Math.min(100, Math.round((totalAttempts / Math.max(totalStudents, 1)) * 100));
+            
+            // Tính thời gian trung bình
+            const avgTimeSeconds = totalAttempts > 0 ? 
+                Math.round(allResults.reduce((sum, r) => sum + r.timeSpent, 0) / totalAttempts) : 0;
+            const avgTime = `${Math.floor(avgTimeSeconds / 60)}:${(avgTimeSeconds % 60).toString().padStart(2, '0')}`;
+
+            document.getElementById('totalStudents').textContent = totalStudents;
+            document.getElementById('totalAttempts').textContent = totalAttempts;
+            document.getElementById('avgScore').textContent = avgScore;
+            document.getElementById('completionRate').textContent = completionRate + '%';
+            document.getElementById('avgTime').textContent = avgTime;
+
+            updateCharts();
+            updateTopStudents();
+        }
+
+        function updateCharts() {
+            updateScoreDistributionChart();
+            updateClassActivityChart();
+        }
+
+        function updateScoreDistributionChart() {
+            const chart = document.getElementById('scoreDistributionChart');
+            chart.innerHTML = '';
+            
+            const scoreRanges = { '0-3': 0, '4-5': 0, '6-7': 0, '8-9': 0, '10': 0 };
+            
+            allResults.forEach(result => {
+                if (result.score <= 3) scoreRanges['0-3']++;
+                else if (result.score <= 5) scoreRanges['4-5']++;
+                else if (result.score <= 7) scoreRanges['6-7']++;
+                else if (result.score <= 9) scoreRanges['8-9']++;
+                else scoreRanges['10']++;
+            });
+            
+            const maxCount = Math.max(...Object.values(scoreRanges));
+            
+            Object.entries(scoreRanges).forEach(([range, count]) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                const height = maxCount > 0 ? (count / maxCount) * 120 + 30 : 30;
+                bar.style.height = height + 'px';
+                
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = range;
+                
+                const value = document.createElement('div');
+                value.className = 'chart-value';
+                value.textContent = count;
+                
+                bar.appendChild(value);
+                bar.appendChild(label);
+                chart.appendChild(bar);
+            });
+        }
+
+        function updateClassActivityChart() {
+            const chart = document.getElementById('classActivityChart');
+            chart.innerHTML = '';
+            
+            const classActivity = {};
+            Object.values(students).forEach(student => {
+                if (!classActivity[student.class]) classActivity[student.class] = 0;
+                classActivity[student.class] += student.attempts;
+            });
+            
+            const maxActivity = Math.max(...Object.values(classActivity));
+            
+            ['9A', '9B', '9C'].forEach(className => {
+                const activity = classActivity[className] || 0;
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                const height = maxActivity > 0 ? (activity / maxActivity) * 120 + 30 : 30;
+                bar.style.height = height + 'px';
+                
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = className;
+                
+                const value = document.createElement('div');
+                value.className = 'chart-value';
+                value.textContent = activity;
+                
+                bar.appendChild(value);
+                bar.appendChild(label);
+                chart.appendChild(bar);
+            });
+        }
+
+        function updateTopStudents() {
+            const container = document.getElementById('topStudents');
+            const topStudents = Object.values(students)
+                .sort((a, b) => b.bestScore - a.bestScore)
+                .slice(0, 5);
+            
+            container.innerHTML = topStudents.map((student, index) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 6px;">
+                    <div>
+                        <span style="font-weight: 600;">${index + 1}. ${student.username}</span>
+                        <span style="color: #7f8c8d; font-size: 12px; margin-left: 10px;">${student.class}</span>
+                    </div>
+                    <div style="font-weight: 600; color: #e74c3c;">${student.bestScore}/10</div>
+                </div>
+            `).join('');
+        }
+
+        function updateStudentsTable() {
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+            
+            const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
+            const classFilter = document.getElementById('classFilter').value;
+            const sortBy = document.getElementById('sortFilter').value;
+            
+            let filteredStudents = Object.values(students).filter(student => {
+                const matchesSearch = student.username.toLowerCase().includes(searchTerm);
+                const matchesClass = !classFilter || student.class === classFilter;
+                return matchesSearch && matchesClass;
+            });
+            
+            // Sắp xếp
+            filteredStudents.sort((a, b) => {
+                switch(sortBy) {
+                    case 'score': return b.bestScore - a.bestScore;
+                    case 'attempts': return b.attempts - a.attempts;
+                    case 'recent': return new Date(b.lastAttempt) - new Date(a.lastAttempt);
+                    default: return a.username.localeCompare(b.username);
+                }
+            });
+            
+            // Hiển thị
+            filteredStudents.forEach((student, index) => {
+                const avgScore = student.attempts > 0 ? (student.totalScore / student.attempts).toFixed(1) : 0;
+                const status = student.attempts >= 3 ? 'badge-success' : 
+                              student.attempts >= 1 ? 'badge-warning' : 'badge-danger';
+                const statusText = student.attempts >= 3 ? 'Tích cực' : 
+                                 student.attempts >= 1 ? 'Đã tham gia' : 'Chưa làm';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${student.username}</strong></td>
+                    <td>${student.class}</td>
+                    <td>${student.email}</td>
+                    <td>${student.attempts}</td>
+                    <td><strong>${student.bestScore}/10</strong></td>
+                    <td>${avgScore}</td>
+                    <td style="font-size: 12px;">${student.lastAttempt || 'Chưa có'}</td>
+                    <td><span class="badge ${status}">${statusText}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateResultsTable() {
+            const tbody = document.getElementById('resultsTableBody');
+            tbody.innerHTML = '';
+            
+            const searchTerm = document.getElementById('resultSearch').value.toLowerCase();
+            const classFilter = document.getElementById('resultClassFilter').value;
+            const scoreFilter = document.getElementById('scoreFilter').value;
+            
+            let filteredResults = allResults.filter(result => {
+                const matchesSearch = result.username.toLowerCase().includes(searchTerm);
+                const matchesClass = !classFilter || result.class === classFilter;
+                const matchesScore = !scoreFilter || (
+                    scoreFilter === '10' ? result.score === 10 :
+                    scoreFilter === '8-9' ? result.score >= 8 && result.score <= 9 :
+                    scoreFilter === '6-7' ? result.score >= 6 && result.score <= 7 :
+                    result.score <= 5
+                );
+                return matchesSearch && matchesClass && matchesScore;
+            });
+            
+            // Sắp xếp mới nhất trước
+            filteredResults.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+            
+            filteredResults.forEach(result => {
+                const timeSpent = `${Math.floor(result.timeSpent / 60)}:${(result.timeSpent % 60).toString().padStart(2, '0')}`;
+                const scoreClass = result.score >= 8 ? 'badge-success' : 
+                                 result.score >= 6 ? 'badge-warning' : 'badge-danger';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-size: 12px;">${result.completedAt}</td>
+                    <td><strong>${result.username}</strong></td>
+                    <td>${result.class}</td>
+                    <td><span class="badge ${scoreClass}">${result.score}/10</span></td>
+                    <td>${timeSpent}</td>
+                    <td>
+                        <button class="nav-btn" style="padding: 4px 8px; font-size: 11px;" 
+                            onclick="viewResultDetails('${result.username}', '${result.completedAt}')">
+                            👁️ Chi tiết
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateQuestionAnalysis() {
+            const container = document.getElementById('questionAnalysis');
+            
+            // Sắp xếp theo số thứ tự câu hỏi
+            const sortedQuestions = [...questionsData].sort((a, b) => a.number - b.number);
+            
+            container.innerHTML = sortedQuestions.map(q => `
+                <div class="question-item">
+                    <div class="question-text">
+                        <strong>Câu ${q.number}:</strong> ${q.text}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${q.correctRate}%"></div>
+                    </div>
+                    <div class="correct-rate" style="color: ${q.correctRate >= 80 ? '#27ae60' : q.correctRate >= 60 ? '#f39c12' : '#e74c3c'}">
+                        ${q.correctRate}%
+                    </div>
+                </div>
+            `).join('');
+
+            updateQuestionRankings();
+        }
+
+        function updateQuestionRankings() {
+            // Câu khó nhất
+            const hardest = [...questionsData].sort((a, b) => a.correctRate - b.correctRate).slice(0, 3);
+            document.getElementById('hardestQuestions').innerHTML = hardest.map(q => `
+                <div style="padding: 10px; margin: 5px 0; background: #fadbd8; border-radius: 6px; border-left: 4px solid #e74c3c;">
+                    <div style="font-weight: 600;">Câu ${q.number}</div>
+                    <div style="font-size: 12px; color: #7f8c8d;">${q.text.substring(0, 50)}...</div>
+                    <div style="color: #e74c3c; font-weight: 600; font-size: 12px;">${q.correctRate}% đúng</div>
+                </div>
+            `).join('');
+
+            // Câu dễ nhất
+            const easiest = [...questionsData].sort((a, b) => b.correctRate - a.correctRate).slice(0, 3);
+            document.getElementById('easiestQuestions').innerHTML = easiest.map(q => `
+                <div style="padding: 10px; margin: 5px 0; background: #d5f5e3; border-radius: 6px; border-left: 4px solid #27ae60;">
+                    <div style="font-weight: 600;">Câu ${q.number}</div>
+                    <div style="font-size: 12px; color: #7f8c8d;">${q.text.substring(0, 50)}...</div>
+                    <div style="color: #27ae60; font-weight: 600; font-size: 12px;">${q.correctRate}% đúng</div>
+                </div>
+            `).join('');
+        }
+
+        function updateExportInfo() {
+            document.getElementById('exportStudents').textContent = Object.keys(students).length;
+            document.getElementById('exportResults').textContent = allResults.length;
+            
+            const dataSize = new Blob([JSON.stringify(allResults)]).size;
+            document.getElementById('exportSize').textContent = Math.round(dataSize / 1024) + 'KB';
+        }
+
+        // ========== CHỨC NĂNG LỌC ==========
+        function filterStudents() {
+            updateStudentsTable();
+        }
+
+        function filterResults() {
+            updateResultsTable();
+        }
+
+        // ========== ĐIỀU HƯỚNG ==========
+        function showSection(sectionId) {
+            document.querySelectorAll('.dashboard-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ========== XUẤT DỮ LIỆU ==========
+        function exportData(format) {
+            let message = '';
+            switch(format) {
+                case 'excel': message = '📊 Xuất dữ liệu Excel cho Bài 15'; break;
+                case 'csv': message = '📝 Xuất file CSV kết quả Bài 15'; break;
+                case 'pdf': message = '📄 Tạo báo cáo PDF Bài 15'; break;
+                case 'json': message = '🔧 Xuất dữ liệu JSON'; break;
+            }
+            alert(message + '\n(Dữ liệu sẽ được tải về)');
+        }
+
+        function generateReport() {
+            alert('📈 Đang tạo báo cáo tổng hợp Bài 15...\n\nNội dung báo cáo:\n• Thống kê tổng quan lớp học\n• Phân tích từng câu hỏi\n• Đánh giá học sinh xuất sắc\n• Khuyến nghị ôn tập');
+        }
+
+        function viewResultDetails(username, timestamp) {
+            alert(`👁️ Chi tiết bài làm:\nHọc sinh: ${username}\nThời gian: ${timestamp}\n\n(Tính năng xem chi tiết từng câu trả lời)`);
+        }
+
+        // ========== KHỞI TẠO ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            analyzeData();
+            
+            // Cập nhật real-time mỗi 5 giây
+            setInterval(() => {
+                const newData = JSON.parse(localStorage.getItem('chemistry_leaderboard')) || [];
+                if (newData.length !== allResults.length) {
+                    allResults = newData;
+                    analyzeData();
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
