@@ -5,100 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Bài 15: Tính chất của kim loại</title>
     
-  <style>
-        body {
-            font-family: Arial, sans-serif;
+     <style>
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
-            background-color: #f5f5f5;
         }
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
-        .section {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header h2 {
+            font-size: 1.3em;
+            opacity: 0.9;
+            font-weight: 300;
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
         }
         .stat-card {
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 10px;
             text-align: center;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .section {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
         }
         .logout-btn {
-            background: #dc3545;
+            background: #e74c3c;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
-            float: right;
+            font-size: 1em;
+            transition: background 0.3s ease;
+            margin: 20px;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <button class="logout-btn" onclick="logout()">Đăng xuất</button>
-        
-        <h1>ADMIN DASHBOARD - BÀI 15</h1>
-        <h2>Tính chất của kim loại</h2>
+        <div class="header">
+            <h1>ADMIN DASHBOARD</h1>
+            <h2>Bài 15: Tính chất của kim loại</h2>
+        </div>
 
-        <div class="section">
-            <h3>📊 Tổng quan Bài 15</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h4>Học sinh làm bài</h4>
-                    <p class="number">150</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Điểm trung bình</h4>
-                    <p class="number">7.5/10</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Thời gian TB</h4>
-                    <p class="number">12:30</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Hoàn thành</h4>
-                    <p class="number">85%</p>
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>🎓 Học sinh làm bài</h3>
+                <div class="number">150</div>
+            </div>
+            <div class="stat-card">
+                <h3>📊 Điểm trung bình</h3>
+                <div class="number">7.5/10</div>
+            </div>
+            <div class="stat-card">
+                <h3>⏱️ Thời gian TB</h3>
+                <div class="number">12:30</div>
+            </div>
+            <div class="stat-card">
+                <h3>✅ Tỷ lệ hoàn thành</h3>
+                <div class="number">85%</div>
             </div>
         </div>
 
         <div class="section">
             <h3>📈 Phân bố điểm số (10 câu)</h3>
-            <p>Biểu đồ phân bố điểm sẽ hiển thị tại đây...</p>
+            <p>Biểu đồ thống kê điểm số sẽ được hiển thị tại đây...</p>
         </div>
 
         <div class="section">
-            <h3>👥 Số lượt làm bài theo lớp</h3>
-            <p>Thống kê theo lớp sẽ hiển thị tại đây...</p>
+            <h3>👥 Thống kê theo lớp</h3>
+            <p>Dữ liệu số lượt làm bài theo từng lớp...</p>
+        </div>
+
+        <div style="text-align: center; padding: 20px;">
+            <button class="logout-btn" onclick="logout()">🚪 Đăng xuất</button>
         </div>
     </div>
 
     <!-- Password Protection -->
     <script>
-        const ADMIN_PASSWORD = "khtnb153469";
+        const ADMIN_PASSWORD = "thangloikt82";
         
         function checkPassword() {
-            const inputPassword = prompt("🔐 NHẬP MẬT KHẨU ADMIN:\n\nVui lòng nhập mật khẩu để truy cập:");
+            const inputPassword = prompt("🔐 TRUY CẬP ADMIN\n\nVui lòng nhập mật khẩu:");
             if (inputPassword === ADMIN_PASSWORD) {
                 return true;
             } else {
-                alert("❌ Mật khẩu không đúng! Truy cập bị từ chối.");
+                alert("❌ Mật khẩu không chính xác!");
                 window.location.href = "index.html";
                 return false;
             }
@@ -110,10 +154,12 @@
             }
         }
         
-        // Kiểm tra password khi trang load
-        if (!checkPassword()) {
-            document.body.innerHTML = "<h1 style='text-align: center; margin-top: 50px; color: red;'>TRUY CẬP BỊ TỪ CHỐI</h1>";
-        }
+        // Kiểm tra password
+        window.onload = function() {
+            if (!checkPassword()) {
+                document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 2em;">🚫 Truy cập bị từ chối</div>';
+            }
+        };
     </script>
         
         // Tự động logout sau 2 giờ
